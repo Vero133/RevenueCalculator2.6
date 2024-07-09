@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <header id="main-header">
+        <div class="container">
+            <img src="https://raw.githubusercontent.com/Vero133/RevenueCalculator2.5/98cdf5d744b70dad6efdb1244bf2ac2fc6e367a1/logo.png" alt="Logo" class="logo" width="500" height="50">
+            
+        </div>
+    </header>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+    
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        #main-header {
+            background-color: #F4F4F4;
+            color: #f4f4f4;
+            padding-top: 10px;
+            min-height: 40px;
+            border-bottom: #f4f4f4 3px solid;
+        }
+       
+        #main-content {
+            background: #fff;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            position: relative;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #e4e4e4;
+            border: 1px solid #ccc;
+        }
+        .result p {
+            margin: 0;
+            padding: 5px;
+            font-size: 18px;
+        }
+        .positive {
+            color: green;
+        }
+        .negative {
+            color: red;
+        }
+        .button {
+            background-color: #000000;
+            color: white;
+            padding: 10px 15px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        .flag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: auto;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+    </header>
+    <div class="container">
+        <section id="main-content">
+            <form id="calculator-form">
+                <div class="form-group">
+                    <label for="country">Select Country:</label>
+                    <select id="country" onchange="updateFlag()">
+                        <option value="RDC">Democratic Republic of Congo</option>
+                        <option value="CIV">Côte d'Ivoire</option>
+                        <option value="MLI">Mali</option>
+                        <option value="CMR">Cameroon</option>
+                        <option value="BFA">Burkina Faso</option>
+                        <option value="SEN">Senegal</option>
+                        <option value="ARG">Argentina</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="start-date">Start Date:</label>
+                    <input type="date" id="start-date">
+                </div>
+                <div class="form-group">
+                    <label for="end-date">End Date:</label>
+                    <input type="date" id="end-date">
+                </div>
+                <div class="form-group">
+                    <label for="product-price">Product Selling Price:</label>
+                    <input type="number" id="product-price" required>
+                </div>
+                <div class="form-group">
+                    <label for="sales-quantity">Received Orders:</label>
+                    <input type="number" id="sales-quantity" required>
+                </div>
+                <div class="form-group">
+                    <label for="ads-cost">Ad Spend:</label>
+                    <input type="number" id="ads-cost" required>
+                </div>
+                <div class="form-group">
+                    <label for="orders-placed">Orders Placed:</label>
+                    <input type="number" id="orders-placed" required>
+                </div>
+                <div class="form-group">
+                    <label for="product-cost">Product Purchase Price:</label>
+                    <input type="number" id="product-cost" required>
+                </div>
+                <button type="button" class="button" onclick="calculate()">Calculate</button>
+                <button type="button" class="button" onclick="downloadPDF()">Download PDF</button>
+                <button type="button" class="button" onclick="downloadExcel()">Download Excel</button>
+            </form>
+            <div id="result" class="result"></div>
+            <img id="flag" class="flag" src="" alt="Flag">
+        </section>
+    </div>
+    <div class="footer">
+        <p>Copyright © 2024 All rights reserved | Shipsen.com</p>
+        <p>❤ Made with love by: Community</p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script>
+        function calculate() {
+            var country = document.getElementById("country").value;
+            var startDate = document.getElementById("start-date").value;
+            var endDate = document.getElementById("end-date").value;
+            var productPrice = parseFloat(document.getElementById("product-price").value);
+            var salesQuantity = parseInt(document.getElementById("sales-quantity").value);
+            var adsCost = parseFloat(document.getElementById("ads-cost").value);
+            var ordersPlaced = parseInt(document.getElementById("orders-placed").value);
+            var productCost = parseFloat(document.getElementById("product-cost").value);
+
+            var totalSales = productPrice * salesQuantity;
+            var totalProductCost = productCost * salesQuantity;
+            
+            var confirmationFees, deliveryCosts, platformFees, codFees, currency, conversionRate;
+
+            if (country === "RDC") {
+                confirmationFees = 4 * salesQuantity;
+                deliveryCosts = 6.5 * salesQuantity;
+                platformFees = 0.2 * ordersPlaced;
+                codFees = 0.1 * totalSales;
+                currency = 'USD';
+                conversionRate = 1; // No need for conversion
+                document.getElementById("flag").src = "https://cdn.britannica.com/94/7194-004-5FA84A72/Flag-Democratic-Republic-of-the-Congo.jpg";
+                
+                var netProfit = totalSales - (totalProductCost + adsCost + confirmationFees + deliveryCosts + platformFees + codFees);
+                var profit = totalSales - (confirmationFees + deliveryCosts + platformFees + codFees);
+                document.getElementById("result").innerHTML = `
+                    <p>Total Sales: ${totalSales.toFixed(2)} ${currency}</p>
+                    <p>Total Product Cost: ${totalProductCost.toFixed(2)} ${currency}</p>
+                    <p>Ad Spend: ${adsCost.toFixed(2)} ${currency}</p>
+                    <p>Confirmation Fees: ${confirmationFees.toFixed(2)} ${currency}</p>
+                    <p>Delivery Costs: ${deliveryCosts.toFixed(2)} ${currency}</p>
+                    <p>Platform Fees: ${platformFees.toFixed(2)} ${currency}</p>
+                    <p>COD Fees: ${codFees.toFixed(2)} ${currency}</p>
+                    <p class="${netProfit >= 0 ? 'positive' : 'negative'}">Net Profit: ${netProfit.toFixed(2)} ${currency}</p>
+                    <p class="${profit >= 0 ? 'positive' : 'negative'}">Profit: ${profit.toFixed(2)} ${currency}</p>
+                `;
+            } else if (["CIV", "MLI", "CMR", "BFA", "SEN", "ARG"].includes(country)) {
+                confirmationFees = 1000 * salesQuantity;
+                deliveryCosts = 3000 * salesQuantity;
+                platformFees = 100 * ordersPlaced;
+                codFees = 0.1 * totalSales;
+                currency = 'XAF';
+                var flagSrc;
+                switch (country) {
+                    case "CIV":
+                        flagSrc = "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Flag_of_C%C3%B4te_d%27Ivoire.svg/1280px-Flag_of_C%C3%B4te_d%27Ivoire.svg.png";
+                        conversionRate = 1 / 66; // 1 MAD = 66 XAF
+                        break;
+                    case "MLI":
+                        flagSrc = "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Flag_of_Mali.svg/1200px-Flag_of_Mali.svg.png";
+                        conversionRate = 1 / 66; // 1 MAD = 66 XAF
+                        break;
+                    case "CMR":
+                        flagSrc = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Flag_of_Cameroon.svg/1280px-Flag_of_Cameroon.svg.png";
+                        conversionRate = 1 / 66; // 1 MAD = 66 XAF
+                        break;
+                    case "BFA":
+                        flagSrc = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Flag_of_Burkina_Faso.svg/1280px-Flag_of_Burkina_Faso.svg.png";
+                        conversionRate = 1 / 66; // 1 MAD = 66 XAF
+                        break;
+                    case "SEN":
+                        flagSrc = "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Flag_of_Senegal.svg/1280px-Flag_of_Senegal.svg.png";
+                        conversionRate = 1 / 66; // 1 MAD = 66 XAF
+                        break;
+                    case "ARG":
+                        flagSrc = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Flag_of_Argentina.svg/1280px-Flag_of_Argentina.svg.png";
+                        conversionRate = 1 / 70; // 1 MAD = 70 XAF
+                        break;
+                }
+                document.getElementById("flag").src = flagSrc;
+
+                var netProfitXAF = totalSales - (totalProductCost + adsCost + confirmationFees + deliveryCosts + platformFees + codFees);
+                var profitXAF = totalSales - (confirmationFees + deliveryCosts + platformFees + codFees);
+                var netProfitMAD = netProfitXAF * conversionRate;
+                var profitMAD = profitXAF * conversionRate;
+                
+                document.getElementById("result").innerHTML = `
+                    <p>Total Sales: ${totalSales.toFixed(2)} ${currency}</p>
+                    <p>Total Product Cost: ${totalProductCost.toFixed(2)} ${currency}</p>
+                    <p>Ad Spend: ${adsCost.toFixed(2)} ${currency}</p>
+                    <p>Confirmation Fees: ${confirmationFees.toFixed(2)} ${currency}</p>
+                    <p>Delivery Costs: ${deliveryCosts.toFixed(2)} ${currency}</p>
+                    <p>Platform Fees: ${platformFees.toFixed(2)} ${currency}</p>
+                    <p>COD Fees: ${codFees.toFixed(2)} ${currency}</p>
+                    <p class="${netProfitXAF >= 0 ? 'positive' : 'negative'}">Net Profit: ${netProfitXAF.toFixed(2)} XAF / ${netProfitMAD.toFixed(2)} MAD</p>
+                    <p class="${profitXAF >= 0 ? 'positive' : 'negative'}">Profit: ${profitXAF.toFixed(2)} XAF / ${profitMAD.toFixed(2)} MAD</p>
+                `;
+            } else {
+                alert("Country not supported!");
+                return;
+            }
+        }
+
+        function updateFlag() {
+            var country = document.getElementById("country").value;
+            var flagSrc;
+            switch (country) {
+                case "RDC":
+                    flagSrc = "https://cdn.britannica.com/94/7194-004-5FA84A72/Flag-Democratic-Republic-of-the-Congo.jpg";
+                    break;
+                case "CIV":
+                    flagSrc = "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Flag_of_C%C3%B4te_d%27Ivoire.svg/1280px-Flag_of_C%C3%B4te_d%27Ivoire.svg.png";
+                    break;
+                case "MLI":
+                    flagSrc = "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Flag_of_Mali.svg/1200px-Flag_of_Mali.svg.png";
+                    break;
+                case "CMR":
+                    flagSrc = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Flag_of_Cameroon.svg/1280px-Flag_of_Cameroon.svg.png";
+                    break;
+                case "BFA":
+                    flagSrc = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Flag_of_Burkina_Faso.svg/1280px-Flag_of_Burkina_Faso.svg.png";
+                    break;
+                case "SEN":
+                    flagSrc = "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Flag_of_Senegal.svg/1280px-Flag_of_Senegal.svg.png";
+                    break;
+                case "ARG":
+                    flagSrc = "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Flag_of_Argentina.svg/1280px-Flag_of_Argentina.svg.png";
+                    break;
+                default:
+                    flagSrc = "";
+            }
+            document.getElementById("flag").src = flagSrc;
+        }
+
+        function downloadPDF() {
+            var { jsPDF } = window.jspdf;
+            var doc = new jsPDF();
+
+            var resultText = document.getElementById("result").innerText;
+
+            doc.text(resultText, 10, 10);
+            doc.save('Revenue_Report.pdf');
+        }
+
+        function downloadExcel() {
+            var resultText = document.getElementById("result").innerText;
+            var data = resultText.split('\n').map(row => row.split(': '));
+
+            var ws = XLSX.utils.aoa_to_sheet(data);
+            var wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Results");
+
+            XLSX.writeFile(wb, "Revenue_Report.xlsx");
+        }
+    </script>
+</body>
+</html>
